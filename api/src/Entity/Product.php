@@ -16,16 +16,25 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    public ?string $name
+    {
+        get { return $this->name; }
+        set(?string $value) { $this->name = $value; }       
+    }
 
     #[ORM\Column]
-    private ?float $price = null;
+    public ?float $price
+    {
+        get { return $this->price; }
+        set(?float $value) { $this->price = $value; }       
+    }
 
     #[ORM\Column]
-    private ?int $stock = null;
-
-    #[ORM\ManyToOne(inversedBy: 'product')]
-    private ?Cart $cart = null;
+    public ?int $stock
+    {
+        get { return $this->stock; }
+        set(?int $value) { $this->stock = $value; }       
+    }
 
     public function getId(): ?int
     {
@@ -39,51 +48,4 @@ class Product
         return $this;
     }
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getPrice(): ?float
-    {
-        return $this->price;
-    }
-
-    public function setPrice(float $price): static
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
-    public function getStock(): ?int
-    {
-        return $this->stock;
-    }
-
-    public function setStock(int $stock): static
-    {
-        $this->stock = $stock;
-
-        return $this;
-    }
-
-    public function getCart(): ?Cart
-    {
-        return $this->cart;
-    }
-
-    public function setCart(?Cart $cart): static
-    {
-        $this->cart = $cart;
-
-        return $this;
-    }
 }
