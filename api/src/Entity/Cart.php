@@ -21,12 +21,6 @@ class Cart
     private ?int $id = null;
 
     /**
-     * @var Collection<int, Product>
-     */
-    #[ORM\ManyToMany(targetEntity: Product::class)]
-    private Collection $product;
-
-    /**
      * Assoc cart to user session id
      */
     #[ORM\Column]
@@ -71,9 +65,16 @@ class Cart
         set(?State $value) { $this->state = $value; }       
     }
 
+    /**
+     * @var Collection<int, CartProduct>
+     */
+    #[ORM\ManyToMany(targetEntity: CartProduct::class, mappedBy: 'cart')]
+    private Collection $cartProducts;
+
     public function __construct()
     {
         $this->product = new ArrayCollection();
+        $this->cartProducts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -89,25 +90,29 @@ class Cart
     }
 
     /**
-     * @return Collection<int, Product>
+     * @return Collection<int, CartProduct>
      */
-    public function getProduct(): Collection
+    public function getCartProducts(): Collection
     {
-        return $this->product;
+        return $this->cartProducts;
     }
 
-    public function addProduct(Product $product): static
+    public function addCartProduct(CartProduct $cartProduct): static
     {
-        if (!$this->product->contains($product)) {
-            $this->product->add($product);
+        if (!$this->cartProducts->contains($cartProduct)) {
+            $this->cartProducts->add($cartProduct);
+            $cartProduct->addCart($this);
         }
 
         return $this;
     }
 
-    public function removeProduct(Product $product): static
+    public function removeCartProduct(CartProduct $cartProduct): static
     {
-        $this->product->removeElement($product);
+        if ($this->cartProducts->removeElement($cartProduct)) {
+            $cartProduct->removeCart($this);
+        }
+
         return $this;
     }
 
