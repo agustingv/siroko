@@ -8,9 +8,34 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use App\Dto\CartItem;
+use App\Dto\CartRemoveItem;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Patch;
 
 #[ORM\Entity(repositoryClass: CartRepository::class)]
-#[ApiResource]
+#[ApiResource(operations: [
+  new GetCollection(),
+  new Post(),
+  new Post(
+      name: 'add_item_cart',
+      status: 202,
+      messenger: 'input',
+      input: CartItem::class,
+      uriTemplate: '/carts/product/add'
+  ),
+new Post(
+      name: 'remove_item_cart',
+      status: 202,
+      messenger: 'input',
+      input: CartRemoveItem::class,
+      uriTemplate: '/carts/product/remove'
+  ),
+  new Delete(),
+  new Patch()
+])]
 class Cart
 {
 
@@ -58,22 +83,21 @@ class Cart
     }
 
     #[ORM\Column]
-    public ?State $state
+    public ?string $state
     {
         get { return $this->state; }
-        set(?State $value) { $this->state = $value; }       
+        set(?string $value) { $this->state = $value; }       
     }
 
     /**
      * @var Collection<int, CartProduct>
      */
-    #[ORM\ManyToMany(targetEntity: CartProduct::class, mappedBy: 'cart')]
-    private Collection $cartProducts;
+    #[ORM\OneToOne(targetEntity: CartProduct::class, mappedBy: 'cart', cascade: ["persist", "remove"])]
+    private CartProduct|null $cartProducts;
 
     public function __construct()
     {
         $this->product = new ArrayCollection();
-        $this->cartProducts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -88,30 +112,15 @@ class Cart
         return $this;
     }
 
-    /**
-     * @return Collection<int, CartProduct>
-     */
-    public function getCartProducts(): Collection
+    public function getCartProducts(): CartProduct | null
     {
         return $this->cartProducts;
     }
 
     public function addCartProduct(CartProduct $cartProduct): static
     {
-        if (!$this->cartProducts->contains($cartProduct)) {
-            $this->cartProducts->add($cartProduct);
-            $cartProduct->addCart($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCartProduct(CartProduct $cartProduct): static
-    {
-        if ($this->cartProducts->removeElement($cartProduct)) {
-            $cartProduct->removeCart($this);
-        }
-
+        $this->cartProducts = $cartProduct;
+        $cartProduct->addCart($this);
         return $this;
     }
 
