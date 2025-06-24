@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
-use App\ValueObject\CartState;
 use App\Dto\CartItem;
 use App\Dto\CartRemoveItem;
 use ApiPlatform\Metadata\GetCollection;
