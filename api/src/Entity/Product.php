@@ -7,28 +7,10 @@ use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Patch;
-use App\Dto\Item;
+
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
-#[ApiResource(operations: [
-  new GetCollection(),
-  new Post(),
-  new Post(
-      name: 'add_item_cart',
-      status: 202,
-      messenger: 'input',
-      input: Item::class,
-      output: false,
-      uriTemplate: '/product/{id}/{quantity}/add'
-  ),
-  new Delete(),
-  new Patch()
-])]
-
+#[ApiResource]
 class Product
 {
     #[ORM\Id]
@@ -64,12 +46,6 @@ class Product
         set(?string $value) { $this->description = $value; }       
     }
 
-    /**
-     * @var Collection<int, CartProduct>
-     */
-    #[ORM\ManyToMany(targetEntity: CartProduct::class, mappedBy: 'product')]
-    private Collection $cartProducts;
-
     public function __construct()
     {
         $this->cartProducts = new ArrayCollection();
@@ -83,33 +59,6 @@ class Product
     public function setId(int $id): static
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, CartProduct>
-     */
-    public function getCartProducts(): Collection
-    {
-        return $this->cartProducts;
-    }
-
-    public function addCartProduct(CartProduct $cartProduct): static
-    {
-        if (!$this->cartProducts->contains($cartProduct)) {
-            $this->cartProducts->add($cartProduct);
-            $cartProduct->addProduct($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCartProduct(CartProduct $cartProduct): static
-    {
-        if ($this->cartProducts->removeElement($cartProduct)) {
-            $cartProduct->removeProduct($this);
-        }
 
         return $this;
     }

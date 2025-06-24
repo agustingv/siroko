@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CartProductRepository::class)]
+#[ApiResource]
 class CartProduct
 {
     #[ORM\Id]
@@ -18,8 +19,8 @@ class CartProduct
     /**
      * @var Collection<int, Cart>
      */
-    #[ORM\ManyToMany(targetEntity: Cart::class, inversedBy: 'cartProducts')]
-    private Collection $cart;
+    #[ORM\OneToOne(targetEntity: Cart::class, inversedBy: 'cartProducts')]
+    private Cart|null $cart;
 
     /**
      * @var Collection<int, Product>
@@ -32,7 +33,6 @@ class CartProduct
 
     public function __construct()
     {
-        $this->cart = new ArrayCollection();
         $this->product = new ArrayCollection();
     }
 
@@ -41,26 +41,15 @@ class CartProduct
         return $this->id;
     }
 
-    /**
-     * @return Collection<int, Cart>
-     */
-    public function getCart(): Collection
+
+    public function getCart(): Cart | null
     {
         return $this->cart;
     }
 
     public function addCart(Cart $cart): static
     {
-        if (!$this->cart->contains($cart)) {
-            $this->cart->add($cart);
-        }
-
-        return $this;
-    }
-
-    public function removeCart(Cart $cart): static
-    {
-        $this->cart->removeElement($cart);
+        $this->cart = $cart;
 
         return $this;
     }
