@@ -25,7 +25,7 @@ class CartProduct
     /**
      * @var Collection<int, Product>
      */
-    #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'cartProducts')]
+    #[ORM\ManyToMany(targetEntity: Product::class)]
     private Collection $product;
 
     #[ORM\Column]
