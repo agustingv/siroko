@@ -16,28 +16,28 @@ class CartProductRepository extends ServiceEntityRepository
         parent::__construct($registry, CartProduct::class);
     }
 
-    //    /**
-    //     * @return CartProduct[] Returns an array of CartProduct objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+      public function create(CartProduct $cartProduct, bool $flush = false): ?CartProduct
+    {
+        $this->getEntityManager()->persist($cartProduct);
 
-    //    public function findOneBySomeField($value): ?CartProduct
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+        return $cartProduct;
+    }
+
+    public function update(CartProduct $cartProduct): ?CartProduct
+    {
+        $this->create($cartProduct, true);
+        return $cartProduct;
+    }
+
+    public function delete(CartProduct $cartProduct, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($cartProduct);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }

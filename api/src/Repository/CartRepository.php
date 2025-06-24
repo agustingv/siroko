@@ -16,16 +16,40 @@ class CartRepository extends ServiceEntityRepository
         parent::__construct($registry, Cart::class);
     }
 
+    public function create(Cart $cart, bool $flush = false): ?Cart
+    {
+        $this->getEntityManager()->persist($cart);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+        return $cart;
+    }
+
+    public function update(Cart $cart): ?Cart
+    {
+        $this->create($cart, true);
+        return $cart;
+    }
+
+    public function delete(Cart $cart, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($cart);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
        /**
         * @return Cart Returns  Cart objects
         */
-       public function findById(int $value): ?Cart
+       public function findById(string $value): ?Cart
        {
            return $this->createQueryBuilder('c')
-               ->andWhere('c.id = :val')
+               ->andWhere('c.session_id = :val')
                ->setParameter('val', $value)
                ->getQuery()
-               ->getResult()
+               ->getOneOrNullResult()
            ;
        }
 }
