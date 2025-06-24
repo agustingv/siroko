@@ -12,7 +12,6 @@ use App\Repository\ProductRepository;
 use App\Repository\CartRepository;
 use App\Repository\CartProductRepository;
 use DateTime;
-use App\ValueObject\CartState;
 
 #[AsMessageHandler]
 final class RemoveProductFromCart
