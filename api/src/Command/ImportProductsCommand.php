@@ -12,7 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use App\Entity\Product;
-use App\App\Product\Command\CreateProduct;
+use App\Repository\ProductRepository;
 
 #[AsCommand(
     name: 'import-products',
@@ -22,6 +22,7 @@ class ImportProductsCommand extends Command
 {
     public function __construct(
         private MessageBusInterface $messageBus, 
+        private ProductRepository $produtRepository
     ) {
         parent::__construct();
     }
@@ -57,11 +58,8 @@ class ImportProductsCommand extends Command
                     $desc = (isset($row[29]))? $row[29] : "description";
                     $product->description = $desc;
 
-                    $product_command = new CreateProduct($product);
-                    $product_envelope = $this->messageBus->dispatch($product_command);
-                    $handledStamp_product = $product_envelope->last(HandledStamp::class);
-                    $e = $handledStamp_product->getResult();
-                    $io->success('Import Product: '.$e->name);
+                    $this->produtRepository->create($product, true);
+                    $io->success('Import Product: '.$product->name);
                 }
                 fclose($fp);
             }
