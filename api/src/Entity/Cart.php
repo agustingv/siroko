@@ -92,12 +92,12 @@ class Cart
     /**
      * @var Collection<int, CartProduct>
      */
-    #[ORM\OneToOne(targetEntity: CartProduct::class, mappedBy: 'cart', cascade: ["persist", "remove"])]
-    private CartProduct|null $cartProducts;
+    #[ORM\ManyToMany(targetEntity: CartProduct::class, inversedBy: 'cart', cascade: ["persist", "remove"])]
+    private Collection|null $cartProducts;
 
     public function __construct()
     {
-        $this->product = new ArrayCollection();
+        $this->cartProducts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -112,15 +112,24 @@ class Cart
         return $this;
     }
 
-    public function getCartProducts(): CartProduct | null
+    public function getCartProducts(): Collection | null
     {
         return $this->cartProducts;
     }
 
     public function addCartProduct(CartProduct $cartProduct): static
     {
-        $this->cartProducts = $cartProduct;
-        $cartProduct->addCart($this);
+        if (!$this->cartProducts->contains($cartProduct))
+        {
+            $this->cartProducts->add($cartProduct);
+        }
+        return $this;
+    }
+
+    public function removeCartProduct(CartProduct $cartProduct): static
+    {
+        $this->cartProducts->removeElement($cartProduct);
+
         return $this;
     }
 

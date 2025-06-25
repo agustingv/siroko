@@ -17,64 +17,31 @@ class CartProduct
     private ?int $id = null;
 
     /**
-     * @var Collection<int, Cart>
-     */
-    #[ORM\OneToOne(targetEntity: Cart::class, inversedBy: 'cartProducts')]
-    private Cart|null $cart;
-
-    /**
      * @var Collection<int, Product>
      */
-    #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'cartProducts')]
-    private Collection $product;
+    #[ORM\OneToOne(targetEntity: Product::class)]
+    public Product $product
+    {
+        get { return $this->product; }
+        set(?Product $value) { $this->product = $value; }       
+    }
 
     #[ORM\Column]
-    public ?int $quantity = null;
-
-    public function __construct()
+    public ?int $quantity
     {
-        $this->product = new ArrayCollection();
+        get { return $this->quantity; }
+        set(?int $value) { $this->quantity = $value; }       
+    }
+
+    #[ORM\Column]
+    public ?string $session_id
+    {
+        get { return $this->session_id; }
+        set(?string $value) { $this->session_id = $value; }       
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-
-    public function getCart(): Cart | null
-    {
-        return $this->cart;
-    }
-
-    public function addCart(Cart $cart): static
-    {
-        $this->cart = $cart;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Product>
-     */
-    public function getProduct(): Collection
-    {
-        return $this->product;
-    }
-
-    public function addProduct(Product $product): static
-    {
-        if (!$this->product->contains($product)) {
-            $this->product->add($product);
-        }
-
-        return $this;
-    }
-
-    public function removeProduct(Product $product): static
-    {
-        $this->product->removeElement($product);
-
-        return $this;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\CartProduct;
+use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,5 +40,17 @@ class CartProductRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findByProduct(Product $product, string $session_id): CartProduct | null
+    {
+        return $this->createQueryBuilder('cp')
+            ->andWhere('cp.session_id = :val')
+            ->andWhere('cp.product = :product')
+            ->setParameter('product', $product)
+            ->setParameter('val', $session_id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
     }
 }
