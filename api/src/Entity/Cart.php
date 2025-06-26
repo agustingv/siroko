@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use DateTime;
 use App\Dto\CartItem;
 use App\Dto\CartRemoveItem;
+use App\Dto\CartState;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
@@ -17,25 +18,32 @@ use ApiPlatform\Metadata\Patch;
 
 #[ORM\Entity(repositoryClass: CartRepository::class)]
 #[ApiResource(operations: [
-  new GetCollection(),
-  new Post(),
-  new Post(
-      name: 'add_item_cart',
-      status: 202,
-      messenger: 'input',
-      input: CartItem::class,
-      uriTemplate: '/carts/product/add'
-  ),
-new Post(
-      name: 'remove_item_cart',
-      status: 202,
-      messenger: 'input',
-      input: CartRemoveItem::class,
-      uriTemplate: '/carts/product/remove'
-  ),
-  new Delete(),
-  new Patch()
-])]
+    new GetCollection(),
+    new Post(),
+    new Post(
+        name: 'add_item_cart',
+        status: 202,
+        messenger: 'input',
+        input: CartItem::class,
+        uriTemplate: '/carts/product/add'
+    ),
+    new Post(
+        name: 'remove_item_cart',
+        status: 202,
+        messenger: 'input',
+        input: CartRemoveItem::class,
+        uriTemplate: '/carts/product/remove'
+    ),
+    new Post(
+        name: 'update_item_cart',
+        status: 202,
+        messenger: 'input',
+        input: CartState::class,
+        uriTemplate: '/carts/product/update'
+    ),
+    new Delete(),
+    new Patch()
+    ])]
 class Cart
 {
 
@@ -59,13 +67,6 @@ class Cart
     {
         get { return $this->customer_id; }
         set(?string $value) { $this->customer_id = $value; }
-    }
-    
-    #[ORM\Column]
-    public ?float $total_price
-    {
-        get { return $this->total_price; }
-        set(?float $value) { $this->total_price = $value; }
     }
 
     #[ORM\Column(type: 'datetime')]
@@ -92,8 +93,9 @@ class Cart
     /**
      * @var Collection<int, CartProduct>
      */
-    #[ORM\ManyToMany(targetEntity: CartProduct::class, inversedBy: 'cart', cascade: ["persist", "remove"])]
+    #[ORM\ManyToMany(targetEntity: CartProduct::class, cascade: ["persist", "remove"])]
     private Collection|null $cartProducts;
+
 
     public function __construct()
     {
@@ -133,4 +135,17 @@ class Cart
         return $this;
     }
 
+    public function getTotalPrice(): ?float
+    {
+        $products = $this->getCartProducts();
+
+        $prices = [];
+        foreach ($products as $cartProducts)
+        {
+            $product = $cartProducts->getProducts();
+            $prices[] = $product[0]->price * $cartProducts->quantity;
+        }
+
+        return array_sum($prices);
+    }
 }

@@ -41,7 +41,7 @@ final class AddProductToCart
             else 
             {
                 $cartProduct = new CartProduct();
-                $cartProduct->product = $product;
+                $cartProduct->addProduct($product);
                 $cartProduct->session_id = $cart->session_id;
                 $cartProduct->quantity = (int)$item->quantity;
                 $this->CartProductRepository->create($cartProduct, true);
@@ -62,7 +62,7 @@ final class AddProductToCart
             $this->CartRepository->create($cart);
 
             $cartProduct = new CartProduct();
-            $cartProduct->product = $product;
+            $cartProduct->addProduct($product);
             $cartProduct->quantity = (int)$item->quantity;
             $cartProduct->session_id = $cart->session_id;
 

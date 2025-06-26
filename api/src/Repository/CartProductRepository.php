@@ -45,9 +45,10 @@ class CartProductRepository extends ServiceEntityRepository
     public function findByProduct(Product $product, string $session_id): CartProduct | null
     {
         return $this->createQueryBuilder('cp')
+            ->join('cp.products', 'p')
+            ->andWhere('p.id = :product')
             ->andWhere('cp.session_id = :val')
-            ->andWhere('cp.product = :product')
-            ->setParameter('product', $product)
+            ->setParameter('product', $product->getId())
             ->setParameter('val', $session_id)
             ->getQuery()
             ->getOneOrNullResult()

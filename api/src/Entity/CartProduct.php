@@ -19,12 +19,8 @@ class CartProduct
     /**
      * @var Collection<int, Product>
      */
-    #[ORM\OneToOne(targetEntity: Product::class)]
-    public Product $product
-    {
-        get { return $this->product; }
-        set(?Product $value) { $this->product = $value; }       
-    }
+    #[ORM\ManyToMany(targetEntity: Product::class)]
+    public Collection $products;
 
     #[ORM\Column]
     public ?int $quantity
@@ -40,8 +36,35 @@ class CartProduct
         set(?string $value) { $this->session_id = $value; }       
     }
 
+    public function __construct()
+    {
+        $this->products = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
+
+    public function getProducts(): Collection | null
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->products->contains($product))
+        {
+            $this->products->add($product);
+        }
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        $this->products->removeElement($product);
+
+        return $this;
+    }
+
 }
