@@ -10,16 +10,20 @@ Todas las partes de la aplicación están montadas con docker compose por lo que
 Se ha usado la versión v2.27.1 de docker compose en Linux. No se garantiza su correcto funcionamiento en otros SO
 
 * Clona el projecto del repositorio
-* Inicia el proyecto con docker compose: docker compose up -d
-* Ejecuta el comando para importar los productos de testing: docker compose exec php bin/console import-products --csv=csv/test-products.csv
+* Inicia el proyecto con docker compose
+    * docker compose up -d
+* Inicia el schema de la base de datos
+    * docker compose exec php doctrine:schema:create
+* Ejecuta el comando para importar los productos de testing
+    * docker compose exec php bin/console import-products --csv=csv/test-products.csv
 
 ## Tests
 
 * Crear la base de datos de pruebas: 
-** docker compose exec php bin/console doctrine:database:create --env=test
-** docker compose exec php bin/console doctrine:schema:create --env=test
+    * docker compose exec php bin/console doctrine:database:create --env=test
+    * docker compose exec php bin/console doctrine:schema:create --env=test
 * Ejecutar los test
-** docker compose exec php bin/phpunit
+    * docker compose exec php bin/phpunit
 
 ## Urls
 
