@@ -33,10 +33,21 @@ final class AddProductToCart
 
         if ($cart = $this->CartRepository->findById($item->cart_id))
         {
-            
-            $cartProduct = $cart->getCartProducts();
-            $cartProduct->addProduct($product);
-            $this->CartProductRepository->update($cartProduct, true);
+            if ($cartProduct = $this->CartProductRepository->findByProduct($product, $cart->session_id))
+            {
+                $cartProduct->quantity = $cartProduct->quantity+1;
+                $this->CartProductRepository->update($cartProduct, true);
+            }
+            else 
+            {
+                $cartProduct = new CartProduct();
+                $cartProduct->addProduct($product);
+                $cartProduct->session_id = $cart->session_id;
+                $cartProduct->quantity = (int)$item->quantity;
+                $this->CartProductRepository->create($cartProduct, true);
+                $cart->addCartProduct($cartProduct);
+                $this->CartRepository->update($cart);
+            }
             return $cart;
         }
         else
@@ -48,13 +59,18 @@ final class AddProductToCart
             $cart->created_at = new DateTime('now');
             $cart->updated_at = new DateTime('now');
             $cart->state = 'init';
-            $this->CartRepository->create($cart, true);
+            $this->CartRepository->create($cart);
 
             $cartProduct = new CartProduct();
-            $cartProduct->addCart($cart);
             $cartProduct->addProduct($product);
+            $cartProduct->quantity = (int)$item->quantity;
+            $cartProduct->session_id = $cart->session_id;
 
             $this->CartProductRepository->create($cartProduct, true);
+
+            $cart->addCartProduct($cartProduct);
+
+            $this->CartRepository->update($cart);
             return $cart;
 
         }
