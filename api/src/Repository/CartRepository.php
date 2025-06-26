@@ -40,16 +40,16 @@ class CartRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-       /**
-        * @return Cart Returns  Cart objects
-        */
-       public function findById(string $value): ?Cart
-       {
-           return $this->createQueryBuilder('c')
-               ->andWhere('c.session_id = :val')
-               ->setParameter('val', $value)
-               ->getQuery()
-               ->getOneOrNullResult()
-           ;
-       }
+    /**
+    * @return Cart Returns  Cart objects
+    */
+    public function findById(string $value): ?Cart
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.session_id = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

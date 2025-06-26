@@ -1,10 +1,7 @@
 import CartItem from "./CartItem"
-
 import { useCartStore } from "../../stores/useCartStore"
-
 import useFromStore from "../../hooks/useFromStore"
-
-
+import Link from 'next/link'
 
 function Cart() {
 	const cart = useFromStore(useCartStore, state => state.cart)
@@ -26,6 +23,7 @@ function Cart() {
 				<span className='text-lg font-bold'>Total:</span>
 				<span className='text-xl font-bold'>${total.toFixed(2)}</span>
 			</div>
+			<Link href="/checkout">Checkout</Link>
 		</section>
 	)
 }

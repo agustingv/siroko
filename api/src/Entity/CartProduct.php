@@ -17,23 +17,28 @@ class CartProduct
     private ?int $id = null;
 
     /**
-     * @var Collection<int, Cart>
-     */
-    #[ORM\OneToOne(targetEntity: Cart::class, inversedBy: 'cartProducts')]
-    private Cart|null $cart;
-
-    /**
      * @var Collection<int, Product>
      */
-    #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'cartProducts')]
-    private Collection $product;
+    #[ORM\ManyToMany(targetEntity: Product::class)]
+    public Collection $products;
 
     #[ORM\Column]
-    public ?int $quantity = null;
+    public ?int $quantity
+    {
+        get { return $this->quantity; }
+        set(?int $value) { $this->quantity = $value; }       
+    }
+
+    #[ORM\Column]
+    public ?string $session_id
+    {
+        get { return $this->session_id; }
+        set(?string $value) { $this->session_id = $value; }       
+    }
 
     public function __construct()
     {
-        $this->product = new ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -41,40 +46,25 @@ class CartProduct
         return $this->id;
     }
 
-
-    public function getCart(): Cart | null
+    public function getProducts(): Collection | null
     {
-        return $this->cart;
-    }
-
-    public function addCart(Cart $cart): static
-    {
-        $this->cart = $cart;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Product>
-     */
-    public function getProduct(): Collection
-    {
-        return $this->product;
+        return $this->products;
     }
 
     public function addProduct(Product $product): static
     {
-        if (!$this->product->contains($product)) {
-            $this->product->add($product);
+        if (!$this->products->contains($product))
+        {
+            $this->products->add($product);
         }
-
         return $this;
     }
 
     public function removeProduct(Product $product): static
     {
-        $this->product->removeElement($product);
+        $this->products->removeElement($product);
 
         return $this;
     }
+
 }

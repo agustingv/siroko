@@ -13,7 +13,8 @@ class ProductTest extends ApiTestCase
             'json' => [
                 'name' => 'Product 1',
                 'price' => 1.0,
-                'stock' => 10
+                'stock' => 10,
+                'description' => 'description'
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
@@ -26,15 +27,16 @@ class ProductTest extends ApiTestCase
             '@type' => 'Product',
             'name' => 'Product 1',
             'price' => 1,
-            'stock' => 10
+            'stock' => 10,
+            'description' => 'description'
         ]);
     }
 
     public function testUpdateProduct(): void
     {
         $client = static::createClient();
-        $iri = $this->findIriBy(Product::class, ['id' => '1']);
-        $client->request('PATCH', $iri, [
+        $product = $this->createProduct();
+        $client->request('PATCH', '/products/'.$product->getId(), [
             'json' => [
                 'name' => 'Product Update',
             ],
@@ -45,8 +47,7 @@ class ProductTest extends ApiTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
-            '@id' => $iri,
-            'id' => 1,
+            'id' => $product->getId(),
             'name' => 'Product Update',
         ]);
     }
@@ -55,14 +56,25 @@ class ProductTest extends ApiTestCase
     {
 
         $client = static::createClient();
-        $iri = $this->findIriBy(Product::class, ['id' => '1']);
 
-        $client->request('DELETE', $iri);
+        $product = $this->createProduct();
+
+        $client->request('DELETE', '/products/'.$product->getId());
 
         $this->assertResponseStatusCodeSame(204);
         $this->assertNull(
-            static::getContainer()->get('doctrine')->getRepository(Product::class)->findOneBy(['id' => '1'])
+            static::getContainer()->get('doctrine')->getRepository(Product::class)->findOneBy(['id' => $product->getId()])
         );
     }
 
+    private function createProduct() : ?Product
+    {
+        $product = new Product();
+        $product->name = "Test Product";
+        $product->price = 128.0;
+        $product->stock = 30;
+        $product->description = "description";
+        return static::getContainer()->get('doctrine')->getRepository(Product::class)->create($product, true);
+
+    }
 }

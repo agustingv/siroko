@@ -46,11 +46,6 @@ class Product
         set(?string $value) { $this->description = $value; }       
     }
 
-    public function __construct()
-    {
-        $this->cartProducts = new ArrayCollection();
-    }
-
     public function getId(): ?int
     {
         return $this->id;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\App\Product\Command;
+namespace App\App\Cart\Command;
 
 
 use App\Entity\Product;
@@ -22,7 +22,6 @@ final class RemoveProductFromCart
         public CartRepository $CartRepository,
         public CartProductRepository $CartProductRepository)
     {
-
     }
 
     public function __invoke(CartRemoveItem $item) : Cart | null
@@ -33,15 +32,21 @@ final class RemoveProductFromCart
 
         if ($cart = $this->CartRepository->findById($item->cart_id))
         {
-            
-            $cartProduct = $cart->getCartProducts();
-            $cartProduct->removeProduct($product);
-            $this->CartProductRepository->update($cartProduct, true);
-            $products = $cartProduct->getProduct();
-            if (count($products) === 0)
+            if ($cartProduct = $this->CartProductRepository->findByProduct($product, $cart->session_id))
             {
-               $this->CartRepository->delete($cart, true);
-               return NULL;
+
+                $cart->removeCartProduct($cartProduct);
+                $this->CartRepository->update($cart, true);
+                $cp = $cart->getCartProducts();
+                if (count($cp) === 0)
+                {
+                    $this->CartRepository->delete($cart, true);
+                    return NULL;
+                }
+            }
+            else 
+            {
+                return NULL;
             }
             return $cart;
         }
