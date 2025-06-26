@@ -9,6 +9,8 @@
     a {
         @apply no-underline text-cyan-700;
     }
+
+    
 }
 
 @layer utilities {
@@ -24,6 +26,7 @@
         transform: translate(13.397459%, -100%) rotate(30deg); /* translateX: 100%*(1-cos(angleRotation) */
         transform-origin: bottom left;
   }
+  .space { position: absolute; margin-top: 50px}
 }
 
 @theme {

@@ -23,7 +23,7 @@ function Cart() {
 				<span className='text-lg font-bold'>Total:</span>
 				<span className='text-xl font-bold'>${total.toFixed(2)}</span>
 			</div>
-			<Link href="/checkout">Checkout</Link>
+			<Link className='space ml-2 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600' href="/checkout">Checkout</Link>
 		</section>
 	)
 }
