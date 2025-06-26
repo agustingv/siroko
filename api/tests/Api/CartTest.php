@@ -45,7 +45,7 @@ class CartTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(204);
         $this->assertNull(
-            static::getContainer()->get('doctrine')->getRepository(Cart::class)->findOneBy(['id' => '1'])
+            static::getContainer()->get('doctrine')->getRepository(Cart::class)->findOneBy(['id' => $cart->getId()])
         );
     }
 
