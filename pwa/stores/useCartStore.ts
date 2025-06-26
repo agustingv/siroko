@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware"
 
 import { Product } from "../types"
 import { v4 } from "uuid";
+import { redirect } from 'next/navigation';
 
 interface State {
 	cart: Product[]
@@ -36,14 +37,28 @@ export async function actionProductCard(path: string, id: number, quantity: numb
         .then((response) => response.json())
         .then((data) => console.log(data));
 }
+export async function updateCard(path: string, state: string, cart: string) {
+    const body = {state: state, cart_id: cart};
 
+    fetch(path, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/ld+json',
+        },
+        body: JSON.stringify(body),
+    })
+        .then((response) => response.json())
+        .then((data) => console.log(data));
+}
 
 export const cartId = (id: string) => {
 
 	if (!id) { return v4() }
 	return id;
 }
-
+export async function Route() {
+	redirect('/products')
+}
 
 export const useCartStore = create(
 	persist<State & Actions>(
@@ -88,6 +103,18 @@ export const useCartStore = create(
 					totalPrice: state.totalPrice - product.price,
 				}))
 			},
+			cleanCart: () => {
+				updateCard('/carts/product/update', 'finish', get().id)
+				set(state => ({
+					id: v4(),
+					cart: [],
+					totalItems: 0,
+					totalPrice: 0
+				}
+			   
+			))
+ 			window.location.href = "/products";
+			}
 		}),
 		{
 			name: "cart-storage",
